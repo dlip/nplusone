@@ -1,0 +1,31 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "nplusone",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": false,
+            "pythonPath": "${config:python.pythonPath}",
+            "program": "${workspaceRoot}/nplusone.py",
+            "cwd": "${workspaceRoot}",
+            "args": [
+                "--column",
+                "5",
+                "--increment",
+                "100",
+                "--known",
+                "${workspaceRoot}/test_known.tsv",
+                "${workspaceRoot}/test_input.tsv",
+                "${workspaceRoot}/test_output.tsv"
+            ],
+            "env": {},
+            "envFile": "${workspaceRoot}/.env",
+            "debugOptions": [
+                "WaitOnAbnormalExit",
+                "WaitOnNormalExit",
+                "RedirectOutput"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,8 @@
+*.pyc
+.noseids
+.vscode/*
+!.vscode/launch.json
+tests/data/*_output.tsv
+/*.tsv
+support/*
+!support/dicrc
