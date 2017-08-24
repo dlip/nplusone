@@ -60,20 +60,25 @@ class Mecab(object):
                 continue
 
             reading = self.kakasi.reading(reading)
+            dict_form_reading = self.kakasi.reading(dict_form_reading)
+
             # Readings using katakana ー dont convert to hiragana so try to take from dict form reading
-            # if u'ー' in reading:
-            #     new_reading = u''
-            #     for i in range(len(reading)):
-            #         if reading[i] == u'ー':
-            #             if i+1 > len(dict_form_reading):
-            #                 x = 1
-            #             new_reading += dict_form_reading[i]
-            #         else:
-            #             new_reading += reading[i]
-            #     reading = new_reading
-            token['surface'] = self.anki_reading(kanji, reading)
+            surface = self.anki_reading(kanji, reading)
+            inside_brackets_match = re.match(u'.*\[(.*[ー].*)\].*', surface)
+            if inside_brackets_match:
+                inside_brackets = inside_brackets_match.group(1)
+                surface_reading = dict_form_reading[0:len(inside_brackets)]
+                surface = re.sub(u'(\[.*\])', '[' + dict_form_reading[0:len(surface_reading)] + ']', surface)
+
+            after_brackets_match = re.match(u'.*\](.*[ー]+)', surface)
+            if after_brackets_match:
+                after_brackets = after_brackets_match.group(1)
+                surface_suffix = kanji[-len(after_brackets):]
+                surface = re.sub(u'\].*', ']' + surface_suffix, surface)
+
+            token['surface'] = surface
             token['dict_form'] = dict_form
-            token['dict_form_reading'] = self.anki_reading(dict_form, self.kakasi.reading(dict_form_reading)).strip()
+            token['dict_form_reading'] = self.anki_reading(dict_form, dict_form_reading).strip()
 
             out.append(token)
         return out
@@ -83,10 +88,13 @@ class Mecab(object):
         # reading should always be at least as long as the kanji
         placeL = 0
         placeR = 0
-        for i in range(1,len(kanji)):
-            if kanji[-i] != reading[-i]:
-                break
-            placeR = i
+        # if its not all kanji until the end, step from right to left to find reading
+        # This is to handle when we have 'ー' but its a kanji only
+        if not re.match(u'[\u4e00-\u9faf]+$', kanji):
+            for i in range(1,len(kanji)):
+                if kanji[-i] != reading[-i] and reading[-i] != u'ー':
+                    break
+                placeR = i
         for i in range(0,len(kanji)-1):
             if kanji[i] != reading[i]:
                 break
