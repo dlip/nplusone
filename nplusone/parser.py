@@ -25,7 +25,7 @@ class Parser(object):
                 self.frequency_list[line.rstrip('\n').rstrip('\r')] = i
                 i += 1
 
-    def parse(self, in_file, out_file, sentence_column=SENTENCE_COLUMN_DEFAULT, frequency_increment=FREQUENCY_INCREMENT_DEFAULT, frequency_limit=FREQUENCY_LIMIT_MAX, known_file=None):
+    def parse(self, in_file, out_file, sentence_column=SENTENCE_COLUMN_DEFAULT, frequency_increment=FREQUENCY_INCREMENT_DEFAULT, frequency_limit=FREQUENCY_LIMIT_MAX, known_file=None, update_known_file=False):
         if frequency_limit > FREQUENCY_LIMIT_MAX:
             frequency_limit = FREQUENCY_LIMIT_MAX
 
@@ -65,6 +65,10 @@ class Parser(object):
 
         if len(sentences) == 0:
             raise Exception('No new vocabulary found. Either all vocabulary is in the known file or you have used the wrong sentence column.')
+
+        known_file_handle = None
+        if known_file and update_known_file:
+            known_file_handle = codecs.open(known_file, 'ab', 'utf-8')
 
         out_file_handle = codecs.open(out_file, "w", "utf-8")
         frequency_index = frequency_increment
@@ -120,6 +124,10 @@ class Parser(object):
                     out_line = '\t'.join(out_cols)
                     out_line += '\n'
                     out_file_handle.write(out_line)
+
+                    if known_file and update_known_file:
+                        known_file_handle.write(token['dict_form'] + '\n')
+
                     added_words[dict_form] = i
                     remove_indexes.append(i)
 
@@ -153,4 +161,6 @@ class Parser(object):
             elif len(added_words) == 0:
                 break
 
+        if known_file_handle:
+            known_file_handle.close()
         out_file_handle.close()
