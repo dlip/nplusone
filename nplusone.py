@@ -1,5 +1,9 @@
 import argparse
-from nplusone.parser import Parser, FREQUENCY_LIMIT_MAX
+from nplusone.parser import \
+    Parser, \
+    SENTENCE_COLUMN_DEFAULT, \
+    FREQUENCY_INCREMENT_DEFAULT, \
+    FREQUENCY_LIMIT_DEFAULT
 
 VERSION='1.0.0'
 
@@ -12,10 +16,10 @@ if __name__ == '__main__':
     arg_parser.set_defaults(func=parse)
 
     arg_parser.add_argument('-v', '--version', action='version', version='NPlusOne Japanese Sentence Miner v' + VERSION)
-    arg_parser.add_argument('-c', '--column', type=int, default=1, help='Column of sentence in input TSV. Default=1')
-    arg_parser.add_argument('-i', '--increment', type=int, default=100, help='Increments to scan frequency of vocabulary. Default=100')
-    arg_parser.add_argument('-l', '--limit', type=int, default=None, help='Maximum frequency index of vocabulary to allow. Default=None, Maximum={}'.format(FREQUENCY_LIMIT_MAX))
-    arg_parser.add_argument('-k', '--known', default=None, help='Text file of known vocabulary, one word per line.')
+    arg_parser.add_argument('-c', '--column', type=int, default=SENTENCE_COLUMN_DEFAULT, help='Column of sentence in input TSV. Default={}.'.format(SENTENCE_COLUMN_DEFAULT))
+    arg_parser.add_argument('-i', '--increment', type=int, default=FREQUENCY_INCREMENT_DEFAULT, help='Increments to scan frequency of vocabulary. Default={}, Set to 0 to disable.'.format(FREQUENCY_INCREMENT_DEFAULT))
+    arg_parser.add_argument('-l', '--limit', type=int, default=FREQUENCY_LIMIT_DEFAULT, help='Maximum frequency index of vocabulary to allow. Default={}, Set to 0 to disable.'.format(FREQUENCY_LIMIT_DEFAULT))
+    arg_parser.add_argument('-k', '--known', default=None, help='Text file of known vocabulary, one word per line. Default=None')
     arg_parser.add_argument('input', help='Path of TSV file to read')
     arg_parser.add_argument('output', help='Path of TSV file to write')
 

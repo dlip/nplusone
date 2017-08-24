@@ -34,7 +34,7 @@ class TestParser(unittest.TestCase):
         self.compareTSV('equivalent', 5)
 
     def test_dependant_sentences_are_resolved(self):
-        self.compareTSV('dependant', 5)
+        self.compareTSV('dependant', 1)
     
     def test_frequency_limit_is_observed(self):
         self.compareTSV('frequency_limit', 1, None, 32)

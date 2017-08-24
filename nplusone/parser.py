@@ -8,6 +8,10 @@ from utils import utf8String
 import os
 
 FREQUENCY_LIMIT_MAX = 202407
+SENTENCE_COLUMN_DEFAULT = 1
+FREQUENCY_INCREMENT_DEFAULT = 100
+FREQUENCY_LIMIT_DEFAULT = FREQUENCY_LIMIT_MAX
+
 
 class Parser(object):
 
@@ -21,7 +25,7 @@ class Parser(object):
                 self.frequency_list[line.rstrip('\n').rstrip('\r')] = i
                 i += 1
 
-    def parse(self, in_file, out_file, sentence_column=1, frequency_increment=None, frequency_limit=None, known_file=None):
+    def parse(self, in_file, out_file, sentence_column=SENTENCE_COLUMN_DEFAULT, frequency_increment=FREQUENCY_INCREMENT_DEFAULT, frequency_limit=FREQUENCY_LIMIT_MAX, known_file=None):
         if frequency_limit > FREQUENCY_LIMIT_MAX:
             frequency_limit = FREQUENCY_LIMIT_MAX
 
