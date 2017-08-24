@@ -5,5 +5,4 @@
 tests/data/*_output.tsv
 /*.tsv
 support/*
-!support/dicrc
 .~lock.*

@@ -1,4 +1,5 @@
 import argparse
+import os
 from nplusone.parser import \
     Parser, \
     SENTENCE_COLUMN_DEFAULT, \
@@ -8,6 +9,11 @@ from nplusone.parser import \
 VERSION='1.0.0'
 
 def parse(args):
+
+    support_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'support')
+    if not os.path.isdir(support_path):
+        raise Exception("Missing support folder, please download from NPlusOne releases page.")
+
     parser = Parser()
     parser.parse(args.input, args.output, args.column, args.increment, args.limit, args.known, args.update_known)
 

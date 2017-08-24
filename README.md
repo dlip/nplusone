@@ -24,8 +24,10 @@ This is impossible to achieve manually as you have to keep track of known vocabu
 ## Installation
 
 - Install [Python 2.7](https://www.python.org/downloads/release/python-2713/)
-- Grab the lastest zip from the [release page](https://github.com/dlip/nplusone/releases).
+- Download the lastest release zip from the [release page](https://github.com/dlip/nplusone/releases).
 - Unzip the release
+- Download the latest support package from the  [release page](https://github.com/dlip/nplusone/releases).
+- Unzip the support package into nplusone folder.
 - Open the command line inside the release folder and run `python nplusone.py`
 
 ### Linux
