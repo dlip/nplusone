@@ -7,7 +7,7 @@
 #
 
 import sys, os, platform, re, subprocess
-from utils import mungeForPlatform, escapeText, getStartupInfo
+from utils import mungeForPlatform, escapeText, getStartupInfo, isWin
 
 kakasiArgs = ["-isjis", "-osjis", "-u", "-JH", "-KH"]
 
@@ -23,7 +23,7 @@ class Kakasi(object):
             [base + "kakasi"] + self.kakasiArgs)
         os.environ['ITAIJIDICT'] = base + "itaijidict"
         os.environ['KANWADICT'] = base + "kanwadict"
-        if not sys.platform == "win32":
+        if not isWin:
             os.chmod(self.kakasiCmd[0], 0o755)
 
     def ensureOpen(self):

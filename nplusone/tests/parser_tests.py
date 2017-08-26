@@ -45,6 +45,9 @@ class TestParser(unittest.TestCase):
     def test_old_vocab_is_ignored_with_known_file(self):
         self.compareTSV('known', 1)
 
+    def test_frequency_from_input(self):
+        self.compareTSV('frequency_from_input', 1, frequency_from_input=True)
+
     def test_invalid_sentence_column_throws_exception(self):
         infile = self.getTSVPath('invalid_column_input')
         outfile = self.getTSVPath('invalid_column_output')

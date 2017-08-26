@@ -7,7 +7,7 @@
 #
 
 import sys, os, platform, re, subprocess
-from utils import mungeForPlatform, escapeText, getStartupInfo
+from utils import mungeForPlatform, escapeText, getStartupInfo, isWin
 from kakasi import Kakasi
 
 mecabArgs = []
@@ -26,7 +26,7 @@ class Mecab(object):
                 '-d', base, '-r', base + "mecabrc"])
         os.environ['DYLD_LIBRARY_PATH'] = base
         os.environ['LD_LIBRARY_PATH'] = base
-        if not sys.platform == "win32":
+        if not isWin:
             os.chmod(self.mecabCmd[0], 0o755)
 
     def ensureOpen(self):

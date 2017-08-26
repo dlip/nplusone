@@ -3,31 +3,21 @@
 import csv
 import codecs
 import re
+import collections
 from mecab import Mecab
 from utils import utf8String
 import os
 
-FREQUENCY_LIMIT_MAX = 202407
 SENTENCE_COLUMN_DEFAULT = 1
 FREQUENCY_INCREMENT_DEFAULT = 100
-FREQUENCY_LIMIT_DEFAULT = FREQUENCY_LIMIT_MAX
-
 
 class Parser(object):
 
     def __init__(self):
         self.mecab = Mecab()
-        self.frequency_list = {}
-        frequency_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'support', 'frequency.txt')
-        with codecs.open(frequency_file, 'rb', 'utf-8') as f:
-            i = 1
-            for line in f:
-                self.frequency_list[line.rstrip('\n').rstrip('\r')] = i
-                i += 1
+        
 
-    def parse(self, in_file, out_file, sentence_column=SENTENCE_COLUMN_DEFAULT, frequency_increment=FREQUENCY_INCREMENT_DEFAULT, frequency_limit=FREQUENCY_LIMIT_MAX, known_file=None, update_known_file=False):
-        if frequency_limit > FREQUENCY_LIMIT_MAX:
-            frequency_limit = FREQUENCY_LIMIT_MAX
+    def parse(self, in_file, out_file, sentence_column=SENTENCE_COLUMN_DEFAULT, frequency_increment=FREQUENCY_INCREMENT_DEFAULT, frequency_limit=None, known_file=None, update_known_file=False, frequency_from_input=False):
 
         known_vocab = {}
         if known_file:
@@ -66,12 +56,37 @@ class Parser(object):
         if len(sentences) == 0:
             raise Exception('No new vocabulary found. Either all vocabulary is in the known file or you have used the wrong sentence column.')
 
+        frequency_list = {}
+        if frequency_from_input:
+            input_frequency = []
+            for sentence in sentences:
+                for token in sentence['tokens']:
+                    if 'dict_form' in token:
+                        input_frequency.append(token['dict_form'])
+            
+            counts = collections.Counter(input_frequency)
+            i = 1
+            for vocab, _ in counts.most_common():
+                frequency_list[vocab] = i
+                i += 1
+        else:
+            frequency_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'support', 'frequency.txt')
+            with codecs.open(frequency_file, 'rb', 'utf-8') as f:
+                i = 1
+                for line in f:
+                    frequency_list[line.rstrip('\n').rstrip('\r')] = i
+                    i += 1
+
+        frequency_list_length = len(frequency_list)
+        if frequency_limit is None or frequency_limit > frequency_list_length:
+            frequency_limit = frequency_list_length
+
         known_file_handle = None
         if known_file and update_known_file:
             known_file_handle = codecs.open(known_file, 'ab', 'utf-8')
 
         out_file_handle = codecs.open(out_file, "w", "utf-8")
-        frequency_index = frequency_increment
+        frequency_index = min(frequency_increment, frequency_list_length)
 
         while True:
             added_words = {}
@@ -91,8 +106,8 @@ class Parser(object):
                     token = sentence['new_tokens'][dict_form]
                     dict_form = token['dict_form']
                     frequency = 0
-                    if dict_form in self.frequency_list:
-                        frequency = self.frequency_list[dict_form]
+                    if dict_form in frequency_list:
+                        frequency = frequency_list[dict_form]
 
                     if frequency_index:
                         if frequency == 0 or frequency > frequency_index:
@@ -145,18 +160,18 @@ class Parser(object):
             if len(sentences) == 0:
                 break
             if frequency_index:
-                if not frequency_limit and frequency_index == FREQUENCY_LIMIT_MAX:
+                if not frequency_limit and frequency_index == frequency_list_length:
                     # Allow more passes without any frequency limit
                     frequency_index = None
                     continue
-                elif frequency_limit and frequency_index == frequency_limit:
+                elif frequency_limit and frequency_index == frequency_limit and len(added_words) == 0:
                    break
 
                 frequency_index += frequency_increment
                 if frequency_limit and frequency_index > frequency_limit:
                     frequency_index = frequency_limit
-                elif not frequency_limit and frequency_index > FREQUENCY_LIMIT_MAX:
-                    frequency_index = FREQUENCY_LIMIT_MAX
+                elif not frequency_limit and frequency_index > frequency_list_length:
+                    frequency_index = frequency_list_length
 
             elif len(added_words) == 0:
                 break

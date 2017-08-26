@@ -3,11 +3,15 @@ import re
 import subprocess
 import os
 
+isMac = sys.platform.startswith("darwin")
+isWin = sys.platform.startswith("win32")
+isLin = not isMac and not isWin
+
 def mungeForPlatform(popen):
-    if sys.platform == "win32":
+    if isWin:
         popen = [os.path.normpath(x) for x in popen]
         popen[0] += ".exe"
-    elif sys.platform == "darwin":
+    elif not isMac:
         popen[0] += ".lin"
     return popen
 
